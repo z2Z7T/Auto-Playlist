@@ -1,0 +1,38 @@
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment / secrets
+.env
+*.env
+
+# Local data / outputs
+data/
+input/
+output/
+logs/
+*.sqlite
+*.sqlite3
+*.db
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.env
+.venv/
+__pycache__/
+.cache-autoplaylist
+.cache-spotify-export
+.DS_Store
+playlist.json
+exports/
