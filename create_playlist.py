@@ -108,17 +108,35 @@ def spotify_request(
     params: dict | None = None,
     payload: dict | None = None,
     action: str = "Spotify request",
+    max_retries: int = 5,
 ) -> dict:
-    response = requests.request(
-        method=method,
-        url=spotify_url(path),
-        headers=headers,
-        params=params,
-        json=payload,
-        timeout=30,
-    )
+    import time
 
-    if not response.ok:
+    for attempt in range(max_retries + 1):
+        response = requests.request(
+            method=method,
+            url=spotify_url(path),
+            headers=headers,
+            params=params,
+            json=payload,
+            timeout=30,
+        )
+
+        if response.status_code == 429:
+            retry_after = int(response.headers.get("Retry-After", "30"))
+            wait_time = retry_after + 2
+
+            print()
+            print(f"Spotify rate limit hit during: {action}")
+            print(f"Waiting {wait_time} seconds before retrying...")
+            time.sleep(wait_time)
+            continue
+
+        if response.ok:
+            if response.text.strip():
+                return response.json()
+            return {}
+
         message = [
             "",
             f"Spotify error during: {action}",
@@ -144,10 +162,9 @@ def spotify_request(
 
         raise SpotifyApiError("\n".join(message))
 
-    if response.text.strip():
-        return response.json()
-
-    return {}
+    raise SpotifyApiError(
+        f"Spotify kept rate-limiting after {max_retries} retries during: {action}"
+    )
 
 
 def spotify_get(headers: dict, path: str, *, params: dict | None = None, action: str) -> dict:
