@@ -1,6 +1,3 @@
 python-dotenv
 requests
-spotipy 
-requests 
-python-dotenv
-dotenv
+spotipy
